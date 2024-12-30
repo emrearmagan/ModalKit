@@ -15,11 +15,11 @@ extension UIColor {
     public static var modalKitBackground: UIColor {
         return UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
-            case .dark:
-                return UIColor(red: 26/255, green: 29/255, blue: 33/255, alpha: 1.0)
+                case .dark:
+                    return UIColor(red: 26/255, green: 29/255, blue: 33/255, alpha: 1.0)
 
-            default:
-                return .white
+                default:
+                    return .white
             }
         }
     }

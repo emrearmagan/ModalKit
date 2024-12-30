@@ -35,6 +35,7 @@ public class MKPresentationController: UIPresentationController {
         // change to false to immediately listen on gesture movement
         gesture.delaysTouchesBegan = false
         gesture.delaysTouchesEnded = false
+
         gesture.name = "mkpresentationcontroller.pangesture"
         gesture.delegate = self
         return gesture
@@ -98,22 +99,49 @@ public class MKPresentationController: UIPresentationController {
         presentedViewController as? MKPresentable
     }
 
+    /// A KVO observer for the scroll view's `contentOffset`.
+    /// If a `scrollView` is provided by `MKPresentable.scrollView`, we observe its offset so we can coordinate the modal's dragging with the scroll view’s scrolling.
     private var scrollViewContentOffsetObserver: NSKeyValueObservation?
+    /// Tracks the last known offset of the scroll view.
     private var scrollViewLastOffsetY: CGFloat = 0
+    /// Indicates if a scroll view is embedded in the presented content.
     private var hasScrollViewEmbeded: Bool = false
-    /// A dictionary mapping Y-origin values to presentation sizes.
+
+    /// This values will be calculated once the presentedViewController is layed out and stored to avoid recalculation
+
+    /// A dictionary mapping each Y-origin to its corresponding `MKPresentationSize`.
+    /// This is used for quick lookups or transitions.
     private var sizeOrigins: [CGFloat: MKPresentationSize] = [:]
-    /// The origins for valid modal positions.
+    /// An array of valid modal snap points (in Y-origin coordinates).
+    /// Each entry corresponds to a preferred presentation size,
+    /// translated into its Y-origin form.
     private var origins: [CGFloat] = []
-    /// The current Y-origin of the modal.
+
+    /// The modal’s current Y-origin among its snap points.
+    /// This indicates the modal’s current vertical position on the screen.
     private var currentOrigin: CGFloat = 0
-    /// The maximum Y-origin for the modal.
-    private var maximumOrigin: CGFloat = 0
-    /// The minimum Y-origin for the modal.
-    private var minimiumOrigin: CGFloat = 0
-    /// The smallest allowable Y-origin for the modal.
+
+    /// The maximum Y-origin that the modal can occupy (i.e., the highest point).
+    /// Corresponds to the top-most boundary within the container.
+    private var maxPossibleOrigin: CGFloat = 0
+
+    /// The minimum Y-origin that the modal can occupy (i.e., the lowest point).
+    /// Corresponds to the bottom-most boundary within the container.
+    private var minPossibleOrigin: CGFloat = 0
+
+    /// The smallest translated Y-origin derived from the presentable’s preferred sizes.
+    /// This often represents the “tallest” version of the modal in coordinate form
+    /// (since a taller modal yields a smaller origin value in a bottom-up system).
     private var smallestOrigin: CGFloat = 0
-    /// The Y-origin at which the modal can be dismissed.
+
+    /// The largest translated Y-origin derived from the presentable’s preferred sizes.
+    /// This often represents the “shortest” version of the modal in coordinate form
+    /// (since a shorter modal yields a larger origin value in a bottom-up system).
+    private var largestOrigin: CGFloat = 0
+
+    /// The Y-origin threshold at which the modal can be dismissed.
+    /// Once the modal exceeds this vertical position (dragged downward),
+    /// the dismissal should be triggered.
     private var dismissableOrigin: CGFloat = 0
 
     /// The frame of the presented view controller within the container view.
@@ -220,9 +248,13 @@ public class MKPresentationController: UIPresentationController {
 
     /// Transitions the presented view controller to a new presentation size.
     ///
-    /// This method adjusts the layout and animates the transition to the specified size.
+    /// When you call this method, it calculates a new Y-origin based on the specified
+    /// presentation size and animates the modal to that position. This is useful for
+    /// programmatically changing the modal’s height (e.g., from `.small` to `.medium`)
+    /// while it is already presented.
     ///
-    /// - Parameter size: The new presentation size to transition to.
+    /// - Parameter size: The new `MKPresentationSize` to transition to.
+    ///   For example, `.small`, `.medium`, `.large`, or a custom height specification.
     open func transition(to size: MKPresentationSize) {
         currentOrigin = translateHeight(height: height(for: size))
         animateContainerOrigin(frameOfPresentedViewInContainerView.origin)
@@ -230,8 +262,13 @@ public class MKPresentationController: UIPresentationController {
 
     /// Ensures the layout of the presented view controller is updated if needed.
     ///
-    /// This method recalculates the layout and animates any changes in the presentation frame.
-    /// It should be called when there are significant layout changes, such as updates to the preferred presentation size.
+    /// This method recalculates the layout (by reapplying configuration and recomputing snap points)
+    /// and animates any changes in the presentation frame. It should be called when there are
+    /// significant layout changes—for example, if the content size changes in a way that
+    /// affects the modal’s intrinsic height.
+    ///
+    /// - Note: This will invoke `setNeedsLayout()` internally and then animate
+    ///   the modal to the newly determined position if needed.
     open func layoutIfNeeded() {
         guard !presentingViewController.isBeingDismissed else { return }
 
@@ -239,6 +276,7 @@ public class MKPresentationController: UIPresentationController {
         presentedViewController.view.layoutIfNeeded()
 
         // TODO: Update configuration for dragIndicator and hasRoundedCorners
+        // Re-apply the configuration & recalculate snap points
         presentable?.configure(&config)
 
         var currentOrigin = self.currentOrigin
