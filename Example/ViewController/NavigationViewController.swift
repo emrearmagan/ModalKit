@@ -78,29 +78,29 @@ private class SettingsRootViewController: UIViewController, MKPresentable {
 
         var description: String {
             switch self {
-            case .darkMode:
-                "Dark Mode"
-            case .language:
-                "Language"
-            case .accounts:
-                "Accounts"
-            case .dashboard:
-                "Dashboard"
-            case .helpFeedback:
-                "Help & Feedback"
-            case .upgrade:
-                "Upgrade"
+                case .darkMode:
+                    "Dark Mode"
+                case .language:
+                    "Language"
+                case .accounts:
+                    "Accounts"
+                case .dashboard:
+                    "Dashboard"
+                case .helpFeedback:
+                    "Help & Feedback"
+                case .upgrade:
+                    "Upgrade"
             }
         }
 
         var tintColor: UIColor {
             switch self {
-            case .darkMode: return .systemGray
-            case .language: return .systemBlue
-            case .accounts: return .systemGreen
-            case .dashboard: return .systemPurple
-            case .helpFeedback: return .systemPink
-            case .upgrade: return .systemYellow
+                case .darkMode: return .systemGray
+                case .language: return .systemBlue
+                case .accounts: return .systemGreen
+                case .dashboard: return .systemPurple
+                case .helpFeedback: return .systemPink
+                case .upgrade: return .systemYellow
             }
         }
     }

@@ -23,9 +23,9 @@ class EmptyViewController: UIViewController, MKPresentable {
     ///   - presentationSize: The preferred sizes for the modal.
     ///   - backgroundColor: The background color of the view controller.
     init(presentationSize: [MKPresentationSize], backgroundColor: UIColor) {
-        self.preferredPresentationSize = presentationSize
+        preferredPresentationSize = presentationSize
         super.init(nibName: nil, bundle: nil)
-        self.view.backgroundColor = backgroundColor
+        view.backgroundColor = backgroundColor
     }
 
     @available(*, unavailable)

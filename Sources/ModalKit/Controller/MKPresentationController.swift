@@ -8,24 +8,25 @@
 
 import UIKit
 
+/// A custom presentation controller for managing modal presentations with configurable sizes, gestures, and animations.
 public class MKPresentationController: UIPresentationController {
     // MARK: Public Properties
 
-    /// View that dims the background when the modal is presented.
+    /// The view that dims the background when the modal is presented.
     open lazy var dimmingView: DimmingView = {
         let view = DimmingView(color: UIColor(white: 0.0, alpha: 0.5))
         view.state = .hidden
         return view
     }()
 
-    /// Indicator that shows a drag handle to the user.
+    /// The drag indicator shown at the top of the modal, allowing users to drag it.
     open lazy var swipeIndicator: UIView = {
         let view = UIView()
         view.backgroundColor = config.dragIndicatorColor
         return view
     }()
 
-    /// Gesture recognizer for dragging the view controller.
+    /// The gesture recognizer for dragging the modal view.
     open lazy var panGestureRecognizer: UIPanGestureRecognizer = {
         let gesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(gesture:)))
         gesture.minimumNumberOfTouches = 1
@@ -34,32 +35,35 @@ public class MKPresentationController: UIPresentationController {
         // change to false to immediately listen on gesture movement
         gesture.delaysTouchesBegan = false
         gesture.delaysTouchesEnded = false
-
         return gesture
     }()
 
+    /// The configuration that defines how the modal is presented and interacted with.
     private var config: MKPresentableConfiguration = .init()
 
     // MARK: Private Properties
 
+    /// Enum representing the direction of the drag gesture.
     private enum DragDirection {
         case up
         case down
     }
 
-    /// Closure that will be executed after the presented view controller has been dismissed
+    /// A closure executed after the modal is dismissed.
     private var onDismiss: (() -> Void)?
 
-    /// Flag indicating whether the PanGesture is currently dragging down.
+    /// The current direction of the drag gesture.
     private var dragDirection: DragDirection = .down
 
-    /// Screen size based on the key window
+    /// The size of the screen, calculated from the key window.
     private var screenSize: CGSize {
         return keyWindow?.bounds.size ?? UIScreen.main.bounds.size
     }
 
+    /// The offset for the drag indicator.
     private let dragIndicatorOffset = 12.0
 
+    /// The safe area insets for the current window.
     private var safeAreaInsets: UIEdgeInsets {
         //  We can not use `presentedViewController.view.safeAreaInsets` since the view ist not fully layed out yet. So we simply use the UIWindow for now
         let topInset = keyWindow?.safeAreaInsets.top ?? 64
@@ -67,42 +71,48 @@ public class MKPresentationController: UIPresentationController {
         return UIEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
     }
 
-    /// The maximum height of the presented view controller.
+    /// The maximum allowable height of the modal view.
     private var maximumHeight: CGFloat {
-        let safeAreaInsets = safeAreaInsets
         return screenSize.height - safeAreaInsets.top
     }
 
-    /// The minimum height of the presented view controller.
+    /// The minimum allowable height of the modal view.
     private var minimumHeight: CGFloat {
-        let safeAreaHeight = safeAreaInsets.bottom
-        return config.showDragIndicator ? config.dragIndicatorSize.height + safeAreaHeight + dragIndicatorOffset : safeAreaHeight
+        let bottomInset = safeAreaInsets.bottom
+        return config.showDragIndicator
+            ? config.dragIndicatorSize.height + bottomInset + dragIndicatorOffset
+            : bottomInset
     }
 
-    /// The key window used to calculate safe area insets.
+    /// The current key window.
     private var keyWindow: UIWindow? {
-        UIApplication
-            .shared
-            .connectedScenes
+        UIApplication.shared.connectedScenes
             .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
             .first { $0.isKeyWindow }
     }
 
-    /// The presented view controller conforming to `MKPresentable`.
+    /// The presented view controller conforming to `MKPresentable`, if applicable.
     private var presentable: MKPresentable? {
-        return presentedViewController as? MKPresentable
+        presentedViewController as? MKPresentable
     }
 
-    private var sizeOrigins: [CGFloat : MKPresentationSize] = [:]
-
+    // Will be calculated one the presentedViewController is layed out and stored to avoid recalculation
+    /// A dictionary mapping Y-origin values to presentation sizes.
+    private var sizeOrigins: [CGFloat: MKPresentationSize] = [:]
+    /// The origins for valid modal positions.
     private var origins: [CGFloat] = []
+    /// The current Y-origin of the modal.
     private var currentOrigin: CGFloat = 0
+    /// The maximum Y-origin for the modal.
     private var maximumOrigin: CGFloat = 0
+    /// The minimum Y-origin for the modal.
     private var minimiumOrigin: CGFloat = 0
+    /// The smallest allowable Y-origin for the modal.
     private var smallestOrigin: CGFloat = 0
+    /// The Y-origin at which the modal can be dismissed.
     private var dismissableOrigin: CGFloat = 0
 
-    /// The frame of the presented view controller within its container.
+    /// The frame of the presented view controller within the container view.
     override public var frameOfPresentedViewInContainerView: CGRect {
         guard let containerView = containerView else { return .zero }
         var frame: CGRect = .zero
@@ -119,24 +129,21 @@ public class MKPresentationController: UIPresentationController {
     // MARK: Init
 
     /// Initializes the presentation controller.
+    ///
     /// - Parameters:
     ///   - presentedViewController: The view controller being presented.
     ///   - presentingViewController: The view controller presenting the modal.
     ///   - direction: The direction of the presentation.
-    ///   - closeOnTap: Determines if tapping outside dismisses the modal.
-    ///   - onDismiss: A closure called when the modal is dismissed.
+    ///   - onDismiss: A closure to execute when the modal is dismissed.
     init(presentedViewController: UIViewController,
          presenting presentingViewController: UIViewController?,
          direction: MKPresentationDirection,
-         onDismiss: (() -> Void)?
-    ) {
+         onDismiss: (() -> Void)?) {
         self.onDismiss = onDismiss
-
-        super.init(presentedViewController: presentedViewController,
-                   presenting: presentingViewController)
+        super.init(presentedViewController: presentedViewController, presenting: presentingViewController)
     }
 
-    // MARK: Lifecyle
+    // MARK: Lifecycle
 
     override public func presentationTransitionWillBegin() {
         super.presentationTransitionWillBegin()
@@ -165,11 +172,6 @@ public class MKPresentationController: UIPresentationController {
         }
     }
 
-    override public func dismissalTransitionDidEnd(_ completed: Bool) {
-        super.dismissalTransitionDidEnd(completed)
-        onDismiss?()
-    }
-
     override public func dismissalTransitionWillBegin() {
         super.dismissalTransitionWillBegin()
 
@@ -184,6 +186,11 @@ public class MKPresentationController: UIPresentationController {
         } completion: { _ in
             self.dimmingView.removeFromSuperview()
         }
+    }
+
+    override public func dismissalTransitionDidEnd(_ completed: Bool) {
+        super.dismissalTransitionDidEnd(completed)
+        onDismiss?()
     }
 
     override public func containerViewWillLayoutSubviews() {
@@ -216,11 +223,11 @@ public class MKPresentationController: UIPresentationController {
     /// Ensures the layout of the presented view controller is updated if needed.
     ///
     /// This method recalculates the layout and animates any changes in the presentation frame.
-    /// It should be called when there are significant layout changes, such as  updates to the preferred presentation size.
+    /// It should be called when there are significant layout changes, such as updates to the preferred presentation size.
     open func layoutIfNeeded() {
         guard !presentingViewController.isBeingDismissed else { return }
 
-        // make sure presented viewcontroller is fully layed out
+        // Ensure the presented view controller's view is fully laid out
         presentedViewController.view.layoutIfNeeded()
 
         // TODO: Update configuration for dragIndicator and hasRoundedCorners
@@ -228,7 +235,7 @@ public class MKPresentationController: UIPresentationController {
 
         var currentOrigin = self.currentOrigin
         setNeedsLayout()
-        // Check whether the current frame still exists, so we dont force the frame back to the first size and keep the current frame
+        // Retain the current frame if it exists in the calculated origins
         if origins.contains(currentOrigin) {
             self.currentOrigin = currentOrigin
         }
@@ -247,28 +254,28 @@ public class MKPresentationController: UIPresentationController {
 //        }
 
         let preferredHeights = preferredPresentationSizes.map(height(for:)).unique().compactMap { $0 }
-        let smallesHeight = preferredHeights.min() ?? 0
+        let smallestHeight = preferredHeights.min() ?? 0
 
         maximumOrigin = translateHeight(height: maximumHeight)
         minimiumOrigin = translateHeight(height: minimumHeight)
         origins = preferredHeights.map(translateHeight(height:))
         currentOrigin = origins.first ?? minimiumOrigin
-        smallestOrigin = translateHeight(height: smallesHeight)
-        dismissableOrigin = translateHeight(height: smallesHeight * min(abs(config.dismissibleScale), 1))
+        smallestOrigin = translateHeight(height: smallestHeight)
+        dismissableOrigin = translateHeight(height: smallestHeight * min(abs(config.dismissibleScale), 1))
     }
 
-    /// Sets up the user interface components.
+    /// Sets up the user interface components for the modal.
     private func setupUI() {
         setupDimmingView()
         setupSwipeIndicator()
 
-        // set default backgroundColor
+        // Set a default background color if none is provided
         if presentedViewController.view.backgroundColor == nil {
             presentedViewController.view.backgroundColor = .modalKitBackground
         }
     }
 
-    /// Configures the dimming view.
+    /// Configures the dimming view used for the modal background.
     private func setupDimmingView() {
         guard let containerView = containerView, !dimmingView.isDescendant(of: containerView) else { return }
 
@@ -283,7 +290,7 @@ public class MKPresentationController: UIPresentationController {
         ])
     }
 
-    /// Configures the swipe indicator.
+    /// Configures the swipe indicator for the modal.
     private func setupSwipeIndicator() {
         guard config.showDragIndicator,
               let rootView = presentedView,
@@ -297,22 +304,22 @@ public class MKPresentationController: UIPresentationController {
             swipeIndicator.centerXAnchor.constraint(equalTo: rootView.centerXAnchor),
             swipeIndicator.heightAnchor.constraint(equalToConstant: config.dragIndicatorSize.height),
             swipeIndicator.widthAnchor.constraint(equalToConstant: config.dragIndicatorSize.width),
-
         ])
         swipeIndicator.layer.cornerRadius = config.dragIndicatorSize.height / 2
     }
 
-    /// Updates the safe area insets for the presented view controller.
+    /// Updates the safe area margins for the modal view controller.
     private func updateSafeAreaMarginGuide() {
         let bottomInset = presentedViewController.view.frame.origin.y
-        let topMargin = config.showDragIndicator ? config.dragIndicatorSize.height + 12 : 0
+        let topMargin = config.showDragIndicator ? config.dragIndicatorSize.height + dragIndicatorOffset : 0
         presentedViewController.additionalSafeAreaInsets = .bottom(bottomInset) + .top(topMargin)
     }
 }
 
-// MARK: PanGesture animation
+// MARK: - PanGesture Animation
 
 extension MKPresentationController {
+    /// Handles the pan gesture to drag the modal up or down.
     @objc private func handlePanGesture(gesture: UIPanGestureRecognizer) {
         guard presentable?.shouldRespond(to: gesture) ?? true,
               !presentedViewController.isBeingDismissed,
@@ -320,18 +327,15 @@ extension MKPresentationController {
 
         // Get the current translation of the gesture
         let translation = gesture.translation(in: presentedViewController.view)
-        // Reset the gesture translation for the next drag movement
-        gesture.setTranslation(CGPoint.zero, in: presentedViewController.view)
+        gesture.setTranslation(.zero, in: presentedViewController.view)
 
         if translation.y != 0 {
             dragDirection = translation.y > 0 ? .down : .up
         }
 
-        // Calculate the new origin for the presented view
         let origin = presentedViewController.view.frame.origin
         var newOrigin = origin.y + translation.y
 
-        let tolerance: CGFloat = 10.0 // Define a tolerance range
         switch gesture.state {
             case .changed:
                 defer {
@@ -339,12 +343,6 @@ extension MKPresentationController {
                         updateSafeAreaMarginGuide()
                         presentedViewController.viewSafeAreaInsetsDidChange()
                     }
-                }
-
-                // Check if the newOrigin is close to any of the predefined origins
-                if let closestOrigin = origins.first(where: { abs($0 - newOrigin) <= tolerance }),
-                   let size = sizeOrigins[closestOrigin] {
-                    presentable?.willTransition(to: size)
                 }
 
                 // Allow downward dragging without resistance
@@ -366,6 +364,7 @@ extension MKPresentationController {
                 if currentOrigin > dismissableOrigin, config.isDismissable {
                     dismissController()
                 } else {
+                    // Get the closest origin an update frame
                     let nearest = closestValue(to: currentOrigin, in: origins, isDraggingUp: dragDirection == .up)
                     self.currentOrigin = nearest
                     animateContainerOrigin(CGPoint(x: origin.x, y: nearest))
@@ -377,11 +376,10 @@ extension MKPresentationController {
     }
 }
 
-// MARK: Helper
+// MARK: - Helper Methods
 
 extension MKPresentationController {
-    /// Translates a given height into a Y-coordinate for positioning the presented view.
-    /// The translation considers the screen size and ensures the resulting point respects the minimum and maximum height bounds.
+    /// Translates a height value to a Y-origin.
     private func translateHeight(height: CGFloat) -> CGFloat {
         let boundedHeight = min(max(height, minimumHeight), maximumHeight)
         return screenSize.height - boundedHeight
@@ -392,22 +390,20 @@ extension MKPresentationController {
         presentingViewController.dismiss(animated: true)
     }
 
-    /// Finds the closest value to a target within a list of values, with a bias based on dragging direction.
+    /// Finds the closest origin value in the list of allowed origins.
     private func closestValue(to target: CGFloat, in values: [CGFloat], isDraggingUp: Bool) -> CGFloat {
         let weightedValues = values.map { origin -> (CGFloat, CGFloat) in
-            // Apply bias based on dragging direction
+            // Apply bias based on dragging direction so we favor the origin that are in the direction we are scrolling
             let bias: CGFloat = isDraggingUp
-                ? (origin < target ? 0.5 : 1.0) // Favor smaller origins when dragging up
-                : (origin > target ? 0.5 : 1.0) // Favor larger origins when dragging down
-
+                ? (origin < target ? 0.5 : 1.0)
+                : (origin > target ? 0.5 : 1.0)
             let weightedDistance = abs(origin - target) * bias
             return (origin, weightedDistance)
         }
-
         return weightedValues.min { $0.1 < $1.1 }?.0 ?? target
     }
 
-    /// Animates the origin of the container.
+    /// Animates the modal view to a new origin.
     private func animateContainerOrigin(_ point: CGPoint) {
         UIView.animate(
             withDuration: 0.4,
@@ -427,43 +423,36 @@ extension MKPresentationController {
     }
 
     /// Calculates the height for a given presentation size.
-    /// - Parameter presentationSize: The presentation size.
-    /// - Returns: The calculated height.
     private func height(for presentationSize: MKPresentationSize) -> CGFloat {
-        let preferredHeight = {
-            switch presentationSize {
-                case .large:
-                    return self.maximumHeight
+        switch presentationSize {
+            case .large:
+                return maximumHeight
 
-                case .medium:
-                    return screenSize.height / 2
+            case .medium:
+                return screenSize.height / 2
 
-                case .small:
-                    return screenSize.height / 4
+            case .small:
+                return screenSize.height / 4
 
-                case let .contentHeight(value):
-                    return value + minimumHeight
+            case let .contentHeight(value):
+                return value + minimumHeight
 
-                case .intrinsicHeight:
-                    self.presentedViewController.view.layoutIfNeeded()
+            case .intrinsicHeight:
+                presentedViewController.view.layoutIfNeeded()
 
-                    // Try calculation the height with constraints
-                    guard let presentedView, let containerView else {
-                        return 0.0
-                    }
+                // Try calculation the height with constraints
+                guard let presentedView, let containerView else {
+                    return 0.0
+                }
 
-                    let targetHeight = presentedView.systemLayoutSizeFitting(
-                        CGSize(
-                            width: containerView.frame.width,
-                            height: UIView.layoutFittingCompressedSize.height
-                        )
-                    ).height
+                let targetHeight = presentedView.systemLayoutSizeFitting(
+                    CGSize(
+                        width: containerView.frame.width,
+                        height: UIView.layoutFittingCompressedSize.height
+                    )
+                ).height
 
-                    return targetHeight + minimumHeight
-            }
-
-        }()
-
-        return min(max(preferredHeight, minimumHeight), maximumHeight)
+                return targetHeight + minimumHeight
+        }
     }
 }
