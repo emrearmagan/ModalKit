@@ -17,6 +17,16 @@ public protocol MKPresentable: AnyObject {
     /// - Default: `.intrinsicHeight`
     var preferredPresentationSize: [MKPresentationSize] { get }
 
+    /// A `UIScrollView` instance, if any, contained within the view controller.
+    ///
+    /// The `scrollView` property allows the `MKPresentationController` to seamlessly track and manage interactions
+    /// between the modal's pan gesture and the scroll view's content scrolling. If provided, this enables the modal
+    /// to handle gestures dynamically, supporting smooth transitions and dismissals while respecting the scroll
+    /// view's scrolling behavior.
+    ///
+    /// - Default: `nil`
+    var scrollView: UIScrollView? { get }
+
     /// Configures the view controller with the necessary presentation settings.
     ///
     /// This method allows the conforming view controller to customize its presentation behavior by modifying
@@ -25,13 +35,13 @@ public protocol MKPresentable: AnyObject {
     /// presented view.
     func configure(_ configuration: inout MKPresentableConfiguration)
 
-    /// Determines if the view controller should respond to a gesture recognized by the pan modal gesture recognizer.
+    /// Determines if the view controller should respond to a gesture recognized by the modal gesture recognizer.
     ///
     /// This method is called when a gesture is detected. Returning `false` will disable interaction with the gesture.
     ///
-    /// - Parameter panModalGestureRecognizer: The gesture recognizer detecting the pan gesture.
+    /// - Parameter gestureRecognizer: The gesture recognizer detecting the pan gesture.
     /// - Returns: A Boolean value indicating whether the view controller should respond to the gesture. Defaults to `true`.
-    func shouldRespond(to panModalGestureRecognizer: UIPanGestureRecognizer) -> Bool
+    func shouldContinue(with gestureRecognizer: UIPanGestureRecognizer) -> Bool
 
     /// Determines if the view controller should transition to a new presentation size.
     ///
@@ -54,9 +64,11 @@ public protocol MKPresentable: AnyObject {
 public extension MKPresentable {
     var preferredPresentationSize: [MKPresentationSize] { [.intrinsicHeight] }
 
+    var scrollView: UIScrollView? { nil }
+
     func configure(_ configuration: inout MKPresentableConfiguration) {}
 
-    func shouldRespond(to panModalGestureRecognizer: UIPanGestureRecognizer) -> Bool { return true }
+    func shouldContinue(with gestureRecognizer: UIPanGestureRecognizer) -> Bool { return true }
 
     func shouldTransition(to size: MKPresentationSize) -> Bool { return true }
 
