@@ -20,6 +20,7 @@ class ExampleViewController: UIViewController {
         case stacked
         case navigation
         case tabBar
+        case scrollView
 
         var description: String {
             switch self {
