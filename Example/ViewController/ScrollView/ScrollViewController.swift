@@ -14,9 +14,13 @@ final class ScrollViewController: UIViewController, UITableViewDataSource, UITab
     // MARK: - MKPresentable Properties
 
     /// Calculates the preferred presentation size based on the table view's content height.
-    var preferredPresentationSize: [MKPresentationSize] = [.contentHeight(300), .large]
+    var preferredPresentationSize: [MKPresentationSize] = [.contentHeight(350), .large]
+
+    var scrollView: UIScrollView? { tableView }
 
     // MARK: - Properties
+
+    private let tableView = UITableView()
 
     /// Sample data for comments.
     private let comments: [Comment] = [
@@ -72,10 +76,7 @@ final class ScrollViewController: UIViewController, UITableViewDataSource, UITab
         )
     ]
 
-    /// The table view for displaying the comments.
-    private let tableView = UITableView()
-
-    // MARK: - Lifecycle
+    // MARK: Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -84,7 +85,7 @@ final class ScrollViewController: UIViewController, UITableViewDataSource, UITab
         tableView.allowsMultipleSelection = true
     }
 
-    // MARK: - Methods
+    // MARK: Methods
 
     private func setupTableView() {
         view.addSubview(tableView)

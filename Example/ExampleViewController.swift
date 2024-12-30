@@ -32,6 +32,7 @@ class ExampleViewController: UIViewController {
                 case .stacked: return "Stacked"
                 case .navigation: return "Navigation"
                 case .tabBar: return "TabBar"
+                case .scrollView: return "ScrollView"
             }
         }
     }
@@ -123,6 +124,9 @@ class ExampleViewController: UIViewController {
 
             case .tabBar:
                 presentModal(TabBarViewController())
+
+            case .scrollView:
+                presentModal(ScrollViewController())
         }
     }
 }
