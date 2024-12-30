@@ -1,0 +1,120 @@
+//
+//  ExampleViewController.swift
+//  ModalKitExample
+//
+//  Created by Emre Armagan on 25.12.24.
+//  Copyright © 2024 Emre Armagan. All rights reserved.
+//
+
+import ModalKit
+import UIKit
+
+class ExampleViewController: UIViewController {
+    /// Types of modals available for presentation.
+    enum MKType: Int, CaseIterable {
+        case test
+        case `default`
+        case `static`
+        case basic
+        case textfield
+        case tableView
+        case navigation
+        case tabBar
+
+        var description: String {
+            switch self {
+                case .test: return "Test"
+                case .default: return "Default"
+                case .basic: return "Basic"
+                case .static: return "Static"
+                case .textfield: return "TextField"
+                case .tableView: return "TableView"
+                case .navigation: return "Navigation"
+                case .tabBar: return "TabBar"
+            }
+        }
+    }
+
+    // MARK: - Properties
+
+    private let scrollView = UIScrollView()
+    private let stackView = UIStackView()
+
+    // MARK: - Lifecycle
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+        configureButtons()
+    }
+
+    // MARK: - UI Setup
+
+    private func setupUI() {
+        stackView.axis = .vertical
+        stackView.spacing = 16
+        stackView.alignment = .fill
+        stackView.distribution = .fill
+
+        view.addSubview(scrollView)
+        scrollView.addSubview(stackView)
+
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+
+            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 16),
+            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
+            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
+            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -16),
+            stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, constant: -32)
+        ])
+    }
+
+    private func configureButtons() {
+        for type in MKType.allCases {
+            let button = createButton(for: type)
+            stackView.addArrangedSubview(button)
+        }
+    }
+
+    private func createButton(for type: MKType) -> UIButton {
+        let button = UIButton(type: .system)
+        button.configuration = .filled()
+        button.configuration?.buttonSize = .large
+        button.tag = type.rawValue
+        button.setTitle(type.description, for: .normal)
+        button.addTarget(self, action: #selector(didTapButton(_:)), for: .touchUpInside)
+        return button
+    }
+
+    // MARK: - Actions
+
+    @objc private func didTapButton(_ sender: UIButton) {
+        guard let type = MKType(rawValue: sender.tag) else { return }
+
+        switch type {
+            case .test:
+                presentModal(TestViewController())
+            case .default:
+                presentModal(DefaultViewController())
+            case .static:
+                presentModal(StaticViewController())
+            case .basic:
+                presentModal(UIViewController())
+            case .textfield:
+                presentModal(TextFieldViewController())
+            case .tableView:
+                presentModal(TableViewController())
+            case .navigation:
+                presentModal(NavigationViewController())
+            case .tabBar:
+                presentModal(TabBarViewController())
+        }
+    }
+}
