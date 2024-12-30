@@ -1,62 +1,15 @@
 //
-//  NavigationViewController.swift
+//  SettingsRootViewController.swift
 //  ModalKitExample
 //
-//  Created by Emre Armagan on 28.12.24.
+//  Created by Emre Armagan on 30.12.24.
 //  Copyright © 2024 Emre Armagan. All rights reserved.
 //
 
 import ModalKit
 import UIKit
 
-/// A custom navigation controller that supports dynamic presentation size adjustment for its view controllers.
-final class NavigationViewController: UINavigationController, MKPresentable {
-    /// Returns the preferred presentation size of the top view controller if it conforms to `MKPresentable`,
-    /// otherwise defaults to `.large`.
-    var preferredPresentationSize: [MKPresentationSize] {
-        if let vc = topViewController as? MKPresentable {
-            return vc.preferredPresentationSize
-        }
-        return [.large]
-    }
-
-    // MARK: Lifecycle
-
-    init() {
-        super.init(nibName: nil, bundle: nil)
-        viewControllers = [SettingsRootViewController()]
-    }
-
-    @available(*, unavailable)
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        delegate = self
-        navigationBar.prefersLargeTitles = false
-        navigationBar.tintColor = .label
-        navigationBar.titleTextAttributes = [
-            .font: UIFont.systemFont(ofSize: 20, weight: .bold),
-            .foregroundColor: UIColor.label
-        ]
-    }
-}
-
-// MARK: - UINavigationControllerDelegate
-
-extension NavigationViewController: UINavigationControllerDelegate {
-    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-        guard !navigationController.isBeingPresented else { return }
-        /// Ensures the presentation layout is updated when transitioning between view controllers.
-        presentationLayoutIfNeeded()
-    }
-}
-
-// MARK: RootViewController
-
-private class SettingsRootViewController: UIViewController, MKPresentable {
+final class SettingsRootViewController: UIViewController, MKPresentable {
     // MARK: Properties
 
     /// Calculates the preferred presentation size based on the content and navigation bar height.
@@ -161,7 +114,13 @@ private class SettingsRootViewController: UIViewController, MKPresentable {
         let height = CGFloat.random(in: 100...UIScreen.main.bounds.height)
         let vc = EmptyViewController(presentationSize: [.contentHeight(height)], backgroundColor: .modalKitBackground)
         vc.title = setting.description
-        navigationController?.pushViewController(vc, animated: true)
+
+        // it is also used in the `NavigationViewController`-Example
+        if let navigationController {
+            navigationController.pushViewController(vc, animated: true)
+        } else {
+            presentModal(vc)
+        }
     }
 
     @objc private func dismissVC() {
@@ -202,7 +161,7 @@ extension SettingsRootViewController {
     private func createFooter() -> UILabel {
         let footerLabel = UILabel()
         footerLabel.text = "© 2024 ModalKit"
-        footerLabel.textColor = .lightGray
+        footerLabel.textColor = .label
         footerLabel.font = .systemFont(ofSize: 12)
         footerLabel.textAlignment = .center
         return footerLabel

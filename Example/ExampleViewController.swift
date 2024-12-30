@@ -12,23 +12,23 @@ import UIKit
 class ExampleViewController: UIViewController {
     /// Types of modals available for presentation.
     enum MKType: Int, CaseIterable {
-        case test
+        case basic
         case `default`
         case `static`
-        case basic
         case textfield
         case tableView
+        case stacked
         case navigation
         case tabBar
 
         var description: String {
             switch self {
-                case .test: return "Test"
-                case .default: return "Default"
                 case .basic: return "Basic"
+                case .default: return "Default"
                 case .static: return "Static"
                 case .textfield: return "TextField"
                 case .tableView: return "TableView"
+                case .stacked: return "Stacked"
                 case .navigation: return "Navigation"
                 case .tabBar: return "TabBar"
             }
@@ -99,20 +99,27 @@ class ExampleViewController: UIViewController {
         guard let type = MKType(rawValue: sender.tag) else { return }
 
         switch type {
-            case .test:
-                presentModal(TestViewController())
+            case .basic:
+                presentModal(EmptyViewController(presentationSize: [.small, .medium, .large], backgroundColor: .modalKitBackground))
+
             case .default:
                 presentModal(DefaultViewController())
+
             case .static:
                 presentModal(StaticViewController())
-            case .basic:
-                presentModal(UIViewController())
+
             case .textfield:
                 presentModal(TextFieldViewController())
+
             case .tableView:
                 presentModal(TableViewController())
+
+            case .stacked:
+                presentModal(SettingsRootViewController())
+
             case .navigation:
                 presentModal(NavigationViewController())
+
             case .tabBar:
                 presentModal(TabBarViewController())
         }
