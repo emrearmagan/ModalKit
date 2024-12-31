@@ -14,12 +14,14 @@ extension UIViewController {
     ///
     /// - Parameters:
     ///   - viewControllerToPresent: The view controller to present.
+    ///   - animated: Whether to animate the presentation
     ///   - completion: A closure to execute after the presentation finishes. Defaults to `nil`.
     public func presentModal(_ viewControllerToPresent: UIViewController,
+                             animated: Bool = true,
                              completion: (() -> Void)? = nil) {
         viewControllerToPresent.modalPresentationStyle = .custom
         viewControllerToPresent.modalPresentationCapturesStatusBarAppearance = true
         viewControllerToPresent.transitioningDelegate = MKPresentationManager.default
-        present(viewControllerToPresent, animated: true, completion: completion)
+        present(viewControllerToPresent, animated: animated, completion: completion)
     }
 }

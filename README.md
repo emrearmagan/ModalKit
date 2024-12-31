@@ -5,13 +5,18 @@
 ![iOS 13.0+](https://img.shields.io/badge/iOS-13.0%2B-blue.svg)
 ![MIT](https://img.shields.io/github/license/mashape/apistatus.svg)
 
-**ModalKit** is a simple and flexible framework for managing modal view presentations in iOS. With support for custom animations, configurable presentation sizes, and interactive gestures, ModalKit simplifies the process of creating dynamic and user-friendly modal interfaces.
+**ModalKit** is a simple and flexible framework for managing modal view presentations in iOS. With support for custom animations, configurable presentation sizes, and interactive gestures. ModalKit simplifies the process of creating dynamic and user-friendly modal interfaces.
 
 <div align="center">
   <img src="./Example/Supporting Files/Preview/TableView.gif" width="30%">
   <img src="./Example/Supporting Files/Preview/Default.gif" width="30%">
   <img src="./Example/Supporting Files/Preview/TabBar.gif" width="30%">
 </div>
+
+## Features
+- `Multiple Sticky Points`: Effortlessly transition between predefined modal heights, such as small, medium, and large.
+- `Scroll View Integration`: Seamlessly handle scroll views, enabling smooth transitions between scrolling and dragging.
+- `Dynamic Resizing`: Adapt the modal's size programmatically or based on content changes.
 
 ## Usage
 
@@ -117,8 +122,6 @@ The MKPresentableConfiguration provides a variety of options:
 | `isDismissable`          | Determines whether the modal can be dismissed by dragging. Default: `true`.                              |
 | `dragResistance`         | Specifies how resistant the modal is to drag gestures, ranging from `0.0` (no resistance) to `1.0` (full resistance). Default: `0`. |
 | `hasRoundedCorners`      | Indicates whether the modal should have rounded corners. Default: `false`.                               |
-| `closeOnTap`             | Determines whether tapping outside the modal should dismiss it. Default: `true`.                         |
-
 
 #### Dynamic Layout Updates
 ModalKit provides methods to dynamically adjust the layout and presentation size of modals during runtime.
