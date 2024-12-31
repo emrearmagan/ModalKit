@@ -36,34 +36,74 @@ viewControllerToPresent.transitioningDelegate = MKPresentationManager()
 present(viewControllerToPresent, animated: true)
 ```
 
-#### Dismissing the Modal
+##### Dismissing the Modal
 To dismiss the modal programmatically:
 ```swift
 self.dismiss(animated: true, completion: nil)
 ```
 
 ## MKPresentable
-ModalKit provides a wide range of customization options to suit your modal presentation needs. These configurations can be applied by conforming to the `MKPresentable` protocol.
+View controllers can conform to the MKPresentable protocol to customize how they are presented. This protocol gives you fine-grained control over:
+- Preferred Presentation Sizes
+- Scroll View Integration
+- Gesture & Transition Control
+- Configuration Settings
 
-#### Customizing Presentation
-You can customize the modal's presentation behavior by conforming to the `MKPresentable` protocol in your view controller:
+Below is an example of a **basic conformance** that also demonstrates optional methods you can override to fully control the modal’s behavior, including transitions and scrolling behavior:
 
 ```swift
 extension MyViewController: MKPresentable {
-    var preferredPresentationSize: [MKPresentationSize] { [.medium, .large] }
 
+    // Defines the possible sizes for the presented view controller (e.g., medium & large).
+    var preferredPresentationSize: [MKPresentationSize] {
+        return [.medium, .large]
+    }
+
+    // If your view contains a scroll view (like a UITableView), provide it here.
+    // ModalKit will observe its offset to seamlessly hand off between scrolling and dragging the modal.
+    var scrollView: UIScrollView? {
+        return myTableView
+    }
+
+    // Called once before the modal is presented. Use this to configure drag indicators,
+    // corner radius, and other presentation options.
     func configure(_ configuration: inout MKPresentableConfiguration) {
         configuration.showDragIndicator = true
         configuration.hasRoundedCorners = true
     }
+
+    // Return false if you want to disallow certain drag gestures (e.g., under some conditions).
+    // By default, this returns true, letting the modal's pan gesture proceed.
+    func shouldContinue(with gestureRecognizer: UIPanGestureRecognizer) -> Bool {
+        return true
+    }
+
+    // Called right before the modal tries to switch to a new size (e.g., from .small to .medium).
+    // Return false to block that transition. By default, this returns true.
+    func shouldTransition(to size: MKPresentationSize) -> Bool {
+        return true
+    }
+
+    // Called immediately before the modal begins resizing to the new size.
+    // Use this to update your UI (e.g., hiding certain subviews).
+    func willTransition(to size: MKPresentationSize) {
+        // e.g., hide a toolbar
+    }
+
+    // Called after the modal has finished transitioning to the new size.
+    // Use this to finalize any layout changes or re-display elements.
+    func didTransition(to size: MKPresentationSize) {
+        // e.g., show the toolbar again
+    }
 }
 ```
 
-#### MKPresentableConfiguration
+
+### MKPresentableConfiguration
+The MKPresentableConfiguration provides a variety of options:
+
 | Option                   | Description                                                                                              |
 |--------------------------|----------------------------------------------------------------------------------------------------------|
-| `preferredPresentationSize` | Defines the possible sizes for the presented view controller.                                             |
-| `configure`              | Configures presentation settings such as rounded corners and drag indicators.                            |
 | `showDragIndicator`      | Indicates whether a drag indicator should be displayed at the top of the modal. Default: `false`.         |
 | `dragIndicatorColor`     | The color of the drag indicator, if enabled. Default: `.label`.                                           |
 | `dragIndicatorSize`      | The size of the drag indicator, if shown. Default: `CGSize(width: 40, height: 5)`.                        |
@@ -100,20 +140,12 @@ ModalKit supports a variety of presentation sizes, which can be defined using th
 - `.contentHeight(CGFloat)`: Fixed height.
 - `.intrinsicHeight`: Automatically adjusts based on content size.
 
+You can provide multiple options in preferredPresentationSize. The modal can snap to whichever is appropriate.
+
 Example:
 ```swift
 preferredPresentationSize: [.small, .medium, .large]
 ```
-
-#### Gestures and Interactions
-ModalKit allows gestures to interact with the modal view, such as dragging to dismiss. You can enable or disable gesture interaction by implementing:
-
-```swift
-func shouldRespond(to panModalGestureRecognizer: UIPanGestureRecognizer) -> Bool {
-    return true
-}
-```
-
 
 ### Examples
 The `ModalKitExample` project provides a variety of usage examples. These examples showcase how to implement and customize ModalKit for different use cases. Explore the `ModalKitExample` project for more details.
