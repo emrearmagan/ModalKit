@@ -13,9 +13,6 @@ import UIKit
 public final class MKPresentationAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     // MARK: Properties
 
-    /// The direction in which the view is presented or dismissed.
-    private let direction: MKPresentationDirection
-
     /// Flag indicating whether the VC is being presented or dismissed.
     private let isPresenting: Bool
 
@@ -26,11 +23,9 @@ public final class MKPresentationAnimator: NSObject, UIViewControllerAnimatedTra
 
     /// Initializes the animator with the specified direction, transition style, and duration.
     /// - Parameters:
-    ///   - direction: The direction of the transition (e.g., from the bottom).
     ///   - transitionStyle: The style of transition (whether it's presenting or dismissing).
     ///   - tranistionDuration: The duration of the transition animation.
-    init(direction: MKPresentationDirection, isPresenting: Bool, tranistionDuration: TimeInterval) {
-        self.direction = direction
+    init(isPresenting: Bool, tranistionDuration: TimeInterval) {
         self.isPresenting = isPresenting
         self.tranistionDuration = tranistionDuration
         super.init()
@@ -59,10 +54,7 @@ public final class MKPresentationAnimator: NSObject, UIViewControllerAnimatedTra
 
         let presentedFrame = transitionContext.finalFrame(for: controller)
         var dismissedFrame = presentedFrame
-        switch direction {
-            case .bottom:
-                dismissedFrame.origin.y = containerView.frame.size.height
-        }
+        dismissedFrame.origin.y = containerView.frame.size.height
 
         let initialFrame = isPresenting ? dismissedFrame : presentedFrame
         let finalFrame = isPresenting ? presentedFrame : dismissedFrame

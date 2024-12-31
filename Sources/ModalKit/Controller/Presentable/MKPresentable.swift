@@ -27,6 +27,12 @@ public protocol MKPresentable: AnyObject {
     /// - Default: `nil`
     var scrollView: UIScrollView? { get }
 
+    /// Handles the event when the dimming view (the background area outside the modal) is tapped.
+    ///
+    /// The default implementation dismisses the modal, but you can override this method to provide custom behavior,
+    /// such as displaying an alert or preventing dismissal.
+    func onDimmingViewTap()
+
     /// Configures the view controller with the necessary presentation settings.
     ///
     /// This method allows the conforming view controller to customize its presentation behavior by modifying
@@ -74,6 +80,8 @@ public extension MKPresentable {
     var preferredPresentationSize: [MKPresentationSize] { [.intrinsicHeight] }
 
     var scrollView: UIScrollView? { nil }
+
+    func onDimmingViewTap() {}
 
     func configure(_ configuration: inout MKPresentableConfiguration) {}
 

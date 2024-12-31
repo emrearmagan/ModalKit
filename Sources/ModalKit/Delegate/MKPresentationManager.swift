@@ -36,18 +36,17 @@ public class MKPresentationManager: NSObject, UIViewControllerTransitioningDeleg
     public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
         let presentationController = MKPresentationController(presentedViewController: presented,
                                                               presenting: presenting,
-                                                              direction: .bottom,
-                                                              onDismiss: nil
+                                                              onDismiss: onDismiss
         )
 
         return presentationController
     }
 
     public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return MKPresentationAnimator(direction: .bottom, isPresenting: true, tranistionDuration: 0.4)
+        return MKPresentationAnimator(isPresenting: true, tranistionDuration: 0.4)
     }
 
     public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return MKPresentationAnimator(direction: .bottom, isPresenting: false, tranistionDuration: 0.4)
+        return MKPresentationAnimator(isPresenting: false, tranistionDuration: 0.4)
     }
 }

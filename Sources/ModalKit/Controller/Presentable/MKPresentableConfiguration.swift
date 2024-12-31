@@ -37,17 +37,13 @@ public struct MKPresentableConfiguration {
     /// Scale at which the vc will be automatically dismissed
     public var dismissibleScale: CGFloat
 
-    /// A flag indicating whether the presented view controller should be dismissed when tapping on the dimmed background. Default is `true`.
-    public var closeOnTap: Bool
-
     public init(hasRoundedCorners: Bool = true,
                 dragResistance: CGFloat = 0,
                 isDismissable: Bool = true,
                 showDragIndicator: Bool = true,
                 dragIndicatorSize: CGSize = .init(width: 40, height: 5),
                 dragIndicatorColor: UIColor = .label,
-                dismissibleScale: CGFloat = 0.6,
-                closeOnTap: Bool = true
+                dismissibleScale: CGFloat = 0.6
     ) {
         self.hasRoundedCorners = hasRoundedCorners
         self.dragResistance = dragResistance
@@ -56,6 +52,5 @@ public struct MKPresentableConfiguration {
         self.dragIndicatorSize = dragIndicatorSize
         self.dragIndicatorColor = dragIndicatorColor
         self.dismissibleScale = dismissibleScale
-        self.closeOnTap = closeOnTap
     }
 }

@@ -172,7 +172,6 @@ public class MKPresentationController: UIPresentationController {
     ///   - onDismiss: A closure to execute when the modal is dismissed.
     init(presentedViewController: UIViewController,
          presenting presentingViewController: UIViewController?,
-         direction: MKPresentationDirection,
          onDismiss: (() -> Void)?) {
         self.onDismiss = onDismiss
         super.init(presentedViewController: presentedViewController, presenting: presentingViewController)
@@ -201,11 +200,7 @@ public class MKPresentationController: UIPresentationController {
     override public func presentationTransitionDidEnd(_ completed: Bool) {
         super.presentationTransitionDidEnd(completed)
         presentedViewController.view.addGestureRecognizer(panGestureRecognizer)
-
-        dimmingView.handler = { [weak self] in
-            guard let self = self, self.config.closeOnTap else { return }
-            self.dismissController()
-        }
+        dimmingView.handler = presentable?.onDimmingViewTap
     }
 
     override public func dismissalTransitionWillBegin() {

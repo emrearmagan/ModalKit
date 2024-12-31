@@ -7,10 +7,10 @@
 
 **ModalKit** is a simple and flexible framework for managing modal view presentations in iOS. With support for custom animations, configurable presentation sizes, and interactive gestures, ModalKit simplifies the process of creating dynamic and user-friendly modal interfaces.
 
-<div>
-<br>
 <div align="center">
-<img src="./docs/overview.png" alt="Overview">
+  <img src="./Example/Supporting Files/Preview/TableView.gif" width="30%">
+  <img src="./Example/Supporting Files/Preview/Default.gif" width="30%">
+  <img src="./Example/Supporting Files/Preview/TabBar.gif" width="30%">
 </div>
 
 ## Usage
@@ -72,6 +72,12 @@ extension MyViewController: MKPresentable {
         configuration.hasRoundedCorners = true
     }
 
+    // Called when the dimming view is tapped.
+    // By default, this dismisses the modal. Override for custom behavior.
+    func onDimmingViewTap() {
+        dismiss(animated: true)
+    }
+    
     // Return false if you want to disallow certain drag gestures (e.g., under some conditions).
     // By default, this returns true, letting the modal's pan gesture proceed.
     func shouldContinue(with gestureRecognizer: UIPanGestureRecognizer) -> Bool {

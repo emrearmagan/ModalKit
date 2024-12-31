@@ -41,7 +41,10 @@ final class StaticViewController: UIViewController, MKPresentable {
         configuration.isDismissable = false
         configuration.dragResistance = 1.0
         configuration.showDragIndicator = false
-        configuration.closeOnTap = false
+    }
+
+    func onDimmingViewTap() {
+        view.shake()
     }
 
     private func setupUI() {
@@ -60,7 +63,7 @@ final class StaticViewController: UIViewController, MKPresentable {
             mainStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 21),
             mainStackView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             mainStackView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            mainStackView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor),
+            mainStackView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor)
         ])
     }
 
@@ -158,5 +161,15 @@ extension StaticViewController {
         confirmButton.addTarget(self, action: #selector(dismissVC), for: .touchUpInside)
 
         return confirmButton
+    }
+}
+
+extension UIView {
+    func shake() {
+        let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
+        animation.duration = 0.4
+        animation.values = [-10.0, 10.0, -10.0, 10.0, -5.0, 5.0, -2.0, 2.0, 0.0]
+        layer.add(animation, forKey: "shake")
     }
 }
