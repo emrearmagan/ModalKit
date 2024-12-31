@@ -117,7 +117,10 @@ public class MKPresentationController: UIPresentationController {
     /// translated into its Y-origin form.
     private var origins: [CGFloat] = []
 
-    /// The modal’s current Y-origin among its snap points.
+    /// The modal’s last known origin among its snap points.
+    private var lastOrigin: CGPoint = .zero
+
+    /// The modal’s current Y-origin
     /// This indicates the modal’s current vertical position on the screen.
     private var currentOrigin: CGFloat = 0
 
@@ -256,8 +259,8 @@ public class MKPresentationController: UIPresentationController {
     /// - Parameter size: The new `MKPresentationSize` to transition to.
     ///   For example, `.small`, `.medium`, `.large`, or a custom height specification.
     open func transition(to size: MKPresentationSize) {
-        currentOrigin = translateHeight(height: height(for: size))
-        animateContainerOrigin(frameOfPresentedViewInContainerView.origin)
+        let newOrigin = translateHeight(height: height(for: size))
+        transitionIfNeeded(to: newOrigin)
     }
 
     /// Ensures the layout of the presented view controller is updated if needed.
@@ -285,7 +288,8 @@ public class MKPresentationController: UIPresentationController {
         if origins.contains(currentOrigin) {
             self.currentOrigin = currentOrigin
         }
-        animateContainerOrigin(frameOfPresentedViewInContainerView.origin)
+
+        animatePresentedView(frameOfPresentedViewInContainerView.origin)
     }
 
     /// Recomputes the modal’s valid Y-origins and snap points based on the presentable’s preferred sizes.
@@ -303,31 +307,48 @@ public class MKPresentationController: UIPresentationController {
         // Update the safe area constraints & begin observing scroll offsets
         updateSafeAreaMarginGuide()
         observeScrollView()
-
         hasScrollViewEmbeded = presentable?.scrollView != nil
-        let preferredPresentationSizes = presentable?.preferredPresentationSize ?? [.intrinsicHeight]
-        let preferredHeights = preferredPresentationSizes.map(height(for:)).unique()
 
-        // Determine the smallest & largest raw heights from the list
-        let smallestHeight = preferredHeights.min() ?? 0
-        let largestHeight = preferredHeights.max() ?? CGFloat.greatestFiniteMagnitude
+        // Clear & rebuild snap points
+        sizeOrigins.removeAll()
+        origins.removeAll()
+        let preferredPresentationSizes = (presentable?.preferredPresentationSize ?? [.intrinsicHeight]).unique()
+        for presentationSize in preferredPresentationSizes {
+            let origin = translateHeight(height: height(for: presentationSize))
+            sizeOrigins[origin] = presentationSize
+            origins.append(origin)
+        }
 
-        // Translate the maximum & minimum allowable modal heights into Y-origins
         maxPossibleOrigin = translateHeight(height: maximumHeight)
         minPossibleOrigin = translateHeight(height: minimumHeight)
-
-        // Convert each preferred height into a valid modal origin (snap point)
-        origins = preferredHeights.map(translateHeight(height:))
-
-        // Default the current origin to the first valid snap, or fall back to the minimum if none
-        currentOrigin = origins.first ?? minPossibleOrigin
-
-        // Convert the smallest & largest valid heights into Y-origins
-        smallestOrigin = translateHeight(height: smallestHeight)
-        largestOrigin = translateHeight(height: largestHeight)
+        smallestOrigin = origins.max() ?? minPossibleOrigin
+        largestOrigin = origins.min() ?? maxPossibleOrigin
+        currentOrigin = origins.first ?? smallestOrigin
+        lastOrigin = CGPoint(x: frameOfPresentedViewInContainerView.origin.x, y: currentOrigin)
 
         // Compute the Y-origin beyond which the modal is considered dismissible
-        dismissableOrigin = translateHeight(height: smallestHeight * min(abs(config.dismissibleScale), 1))
+        let smallesHeight = preferredPresentationSizes.map(height(for:)).min() ?? minimumHeight
+        dismissableOrigin = translateHeight(height: smallesHeight * min(abs(config.dismissibleScale), 1))
+    }
+
+    /// Attempts to transition the modal to a given Y-origin, if allowed by the `presentable`.
+    private func transitionIfNeeded(to yOrigin: CGFloat) {
+        guard let snapSize = sizeOrigins[yOrigin],
+              let presentable = presentable else {
+            animatePresentedView(lastOrigin)
+            return
+        }
+
+        if presentable.shouldTransition(to: snapSize) {
+            presentable.willTransition(to: snapSize)
+            let origin = CGPoint(x: lastOrigin.x, y: yOrigin)
+            lastOrigin = origin
+            animatePresentedView(origin) {
+                presentable.didTransition(to: snapSize)
+            }
+        } else {
+            animatePresentedView(lastOrigin)
+        }
     }
 
     /// Sets up the user interface components for the modal.
@@ -416,17 +437,11 @@ extension MKPresentationController {
         change: NSKeyValueObservedChange<CGPoint>
     ) {
         let atTop = (currentOrigin.rounded() <= largestOrigin.rounded())
-        let isUserDragging = scrollView.isTracking && scrollView.isDragging
+        let isUserDragging = scrollView.isDragging || !scrollView.isDecelerating && scrollView.isTracking
 
+        // If modal isn't at top, lock the scroll offset to the last known so the modal can move up first.
         // If user isn't actively dragging, just record the current offset & bail.
-        if !isUserDragging {
-            scrollViewLastOffsetY = max(scrollView.contentOffset.y, 0)
-            return
-        }
-
-        // If modal isn't at top, lock the scroll offset to the last known
-        // so the modal can move up first.
-        if !atTop {
+        if !atTop, isUserDragging {
             scrollView.setContentOffset(CGPoint(x: 0, y: scrollViewLastOffsetY), animated: false)
         } else {
             // Otherwise, let the scroll view track normally
@@ -486,6 +501,7 @@ extension MKPresentationController {
         gesture.setTranslation(.zero, in: presentedViewController.view)
 
         guard shouldBegin(gesture) else { return }
+
         if translation.y != 0 {
             dragDirection = translation.y > 0 ? .down : .up
         }
@@ -497,37 +513,37 @@ extension MKPresentationController {
             case .changed:
                 defer {
                     if newOrigin < smallestOrigin {
+                        // Only update the safeArea when the user is dragging upwards above the samlles origin
                         updateSafeAreaMarginGuide()
                         presentedViewController.viewSafeAreaInsetsDidChange()
                     }
                 }
 
-                let maxPossibleOrigin = hasScrollViewEmbeded ? largestOrigin : self.maxPossibleOrigin
+                // If a scroll view is embedded, we consider `largestOrigin` as the top snap.
+                // Otherwise, use `maxPossibleOrigin`.
+                let snapPointY = hasScrollViewEmbeded ? largestOrigin : maxPossibleOrigin
 
                 // Allow downward dragging without resistance
                 if dragDirection == .down, config.isDismissable {
-                    newOrigin = max(newOrigin, maxPossibleOrigin)
+                    newOrigin = max(newOrigin, snapPointY)
                 } else {
                     // Scale translation by resistance
                     let resistanceFactor = min(max(config.dragResistance, 0.0), 1.0)
                     let effectiveTranslation = translation.y * (1.0 - resistanceFactor)
-                    newOrigin = max(maxPossibleOrigin, origin.y + effectiveTranslation)
+                    newOrigin = max(snapPointY, origin.y + effectiveTranslation)
                 }
 
                 presentedViewController.view.frame.origin.y = newOrigin
                 currentOrigin = newOrigin
 
             case .ended:
-                let currentOrigin = presentedViewController.view.frame.origin.y
-
-                // If new height is below min, dismiss controller
-                if currentOrigin > dismissableOrigin, config.isDismissable {
+                // If pulled beyond dismissable threshold => dismiss
+                if origin.y > dismissableOrigin, config.isDismissable {
                     dismissController()
                 } else {
-                    // Get the closest origin an update frame
+                    // Snap to closest origin
                     let nearest = closestValue(to: currentOrigin, in: origins, dragDirection: dragDirection)
-                    self.currentOrigin = nearest
-                    animateContainerOrigin(CGPoint(x: origin.x, y: nearest))
+                    transitionIfNeeded(to: nearest)
                 }
 
             default:
@@ -593,8 +609,8 @@ extension MKPresentationController {
         return weightedValues.min { $0.1 < $1.1 }?.0 ?? target
     }
 
-    /// Animates the modal view to a new origin.
-    private func animateContainerOrigin(_ point: CGPoint) {
+    /// Animates the presented view controller's frame to a given origin point.
+    private func animatePresentedView(_ point: CGPoint, _ completion: (() -> Void)? = nil) {
         UIView.animate(
             withDuration: 0.4,
             delay: 0,
@@ -608,6 +624,7 @@ extension MKPresentationController {
             },
             completion: { _ in
                 self.presentedViewController.viewSafeAreaInsetsDidChange()
+                completion?()
             }
         )
     }

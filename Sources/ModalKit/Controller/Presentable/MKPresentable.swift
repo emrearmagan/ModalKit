@@ -45,19 +45,28 @@ public protocol MKPresentable: AnyObject {
 
     /// Determines if the view controller should transition to a new presentation size.
     ///
-    /// This method is called when the presentation controller attempts to transition to a new size. Returning `false`
-    /// prevents the transition.
+    /// Called right before the presentation controller attempts to transition.
+    /// Return `false` to prevent the transition; `true` to allow it.
+    /// The default implementation returns `true`.
     ///
-    /// - Parameter size: The proposed `MKPresentationSize` to transition to.
-    /// - Returns: A Boolean value indicating whether the transition should occur. Defaults to `true`.
+    /// - Parameter size: The proposed `MKPresentationSize`.
+    /// - Returns: A Boolean indicating whether the transition can occur.
     func shouldTransition(to size: MKPresentationSize) -> Bool
 
     /// Called when the view controller is about to transition to a new presentation size.
     ///
-    /// Use this method to perform any necessary updates or animations in preparation for the transition.
+    /// This is your chance to adjust layout or perform any animations in tandem
+    /// with the modal’s own transition.
     ///
-    /// - Parameter size: The new `MKPresentationSize` the presentation is transitioning to.
+    /// - Parameter size: The new `MKPresentationSize` the modal is transitioning to.
     func willTransition(to size: MKPresentationSize)
+
+    /// Called after the view controller has transitioned to a new presentation size.
+    ///
+    /// Use this to finalize layout changes or trigger any post-transition updates.
+    ///
+    /// - Parameter size: The new `MKPresentationSize` the modal ended up with.
+    func didTransition(to size: MKPresentationSize)
 }
 
 /// Default values for the `MKPresentable`
@@ -73,4 +82,6 @@ public extension MKPresentable {
     func shouldTransition(to size: MKPresentationSize) -> Bool { return true }
 
     func willTransition(to size: MKPresentationSize) {}
+
+    func didTransition(to size: MKPresentationSize) {}
 }
