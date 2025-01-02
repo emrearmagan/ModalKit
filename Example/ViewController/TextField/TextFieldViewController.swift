@@ -64,7 +64,7 @@ final class TextFieldViewController: UIViewController, MKPresentable {
 
             footerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             footerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            footerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            footerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
 
@@ -122,7 +122,7 @@ extension TextFieldViewController {
         textField.placeholder = "Enter your name"
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = UIColor.systemGray.cgColor
-        textField.layer.cornerRadius = 5
+        textField.layer.cornerRadius = 8
         textField.font = .systemFont(ofSize: 16, weight: .semibold)
         textField.delegate = self
         textField.returnKeyType = .done
@@ -140,7 +140,7 @@ extension TextFieldViewController {
     private func createFooter() -> UIView {
         var config = UIButton.Configuration.filled()
         config.cornerStyle = .medium
-        config.title = "Continue"
+        config.title = "Search"
         config.buttonSize = .large
 
         confirmButton.configuration = config

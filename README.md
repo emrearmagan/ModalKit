@@ -10,6 +10,7 @@
 <div align="center">
   <img src="./Example/Supporting Files/Preview/TableView.gif" width="30%">
   <img src="./Example/Supporting Files/Preview/Default.gif" width="30%">
+  <img src="./Example/Supporting Files/Preview/Textfield.gif" width="30%">
   <img src="./Example/Supporting Files/Preview/TabBar.gif" width="30%">
 </div>
 
