@@ -14,13 +14,14 @@ final class ScrollViewController: UIViewController, UITableViewDataSource, UITab
     // MARK: - MKPresentable Properties
 
     /// Calculates the preferred presentation size based on the table view's content height.
-    var preferredPresentationSize: [MKPresentationSize] = [.contentHeight(350), .large]
+    var preferredPresentationSize: [MKPresentationSize] = [.contentHeight(400), .large]
 
     var scrollView: UIScrollView? { tableView }
 
     // MARK: - Properties
 
     private let tableView = UITableView()
+    private let commentView = CommentTextFieldView()
 
     /// Sample data for comments.
     private let comments: [Comment] = [
@@ -80,22 +81,35 @@ final class ScrollViewController: UIViewController, UITableViewDataSource, UITab
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTableView()
+        setupUI()
 
         tableView.allowsMultipleSelection = true
     }
 
     // MARK: Methods
 
-    private func setupTableView() {
+    func configure(_ configuration: inout MKPresentableConfiguration) {
+        configuration.dragResistance = 0.8
+    }
+
+    private func setupUI() {
+        commentView.backgroundColor = .modalKitBackground
+
         view.addSubview(tableView)
+        view.addSubview(commentView)
+
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        commentView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: commentView.topAnchor),
+
+            commentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            commentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            commentView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
 
         tableView.dataSource = self
@@ -127,7 +141,7 @@ final class ScrollViewController: UIViewController, UITableViewDataSource, UITab
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView()
-        headerView.backgroundColor = .systemGray6
+        headerView.backgroundColor = .modalKitBackground
 
         let headerLabel = UILabel()
         headerLabel.text = "Comments \(comments.count)"
@@ -137,9 +151,9 @@ final class ScrollViewController: UIViewController, UITableViewDataSource, UITab
         headerView.addSubview(headerLabel)
         headerLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
+            headerLabel.topAnchor.constraint(equalTo: headerView.topAnchor),
             headerLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 16),
             headerLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -16),
-            headerLabel.topAnchor.constraint(equalTo: headerView.topAnchor),
             headerLabel.bottomAnchor.constraint(equalTo: headerView.bottomAnchor, constant: -8)
         ])
         return headerView
