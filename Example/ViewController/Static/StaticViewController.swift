@@ -44,6 +44,7 @@ final class StaticViewController: UIViewController, MKPresentable {
     }
 
     func onDimmingViewTap() {
+        closeButtonTapped()
         view.shake()
     }
 

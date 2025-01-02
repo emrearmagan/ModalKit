@@ -34,7 +34,6 @@ final class TabBarViewController: UITabBarController, MKPresentable {
 
     func configure(_ configuration: inout MKPresentableConfiguration) {
         configuration.dragResistance = 0.5
-        configuration.isDismissable = true
     }
 
     /// Sets up the view controllers for the tab bar.
