@@ -149,6 +149,7 @@ ModalKit supports a variety of presentation sizes, which can be defined using th
 - `.small`: Quarter-screen presentation.
 - `.contentHeight(CGFloat)`: Fixed height.
 - `.intrinsicHeight`: Automatically adjusts based on content size.
+- ``.additionalHeight(MKPresentationSize, CGFloat): Allows specifying an additional offset height relative to another presentation size.
 
 You can provide multiple options in preferredPresentationSize. The modal can snap to whichever is appropriate.
 

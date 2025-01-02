@@ -192,8 +192,8 @@ public class MKPresentationController: UIPresentationController {
             return
         }
 
-        coordinator.animate(alongsideTransition: { _ in
-            self.dimmingView.state = .visible
+        coordinator.animate(alongsideTransition: { [weak self] _ in
+            self?.dimmingView.state = .visible
         })
     }
 
@@ -215,10 +215,10 @@ public class MKPresentationController: UIPresentationController {
             return
         }
 
-        coordinator.animate { _ in
-            self.dimmingView.state = .hidden
-        } completion: { _ in
-            self.dimmingView.removeFromSuperview()
+        coordinator.animate { [weak self] _ in
+            self?.dimmingView.state = .hidden
+        } completion: { [weak self] _ in
+            self?.dimmingView.removeFromSuperview()
         }
     }
 
@@ -651,6 +651,9 @@ extension MKPresentationController {
                 ).height
 
                 return targetHeight + minimumHeight
+
+            case let .additionalHeight(size, offset):
+                return height(for: size) + offset
         }
     }
 }
