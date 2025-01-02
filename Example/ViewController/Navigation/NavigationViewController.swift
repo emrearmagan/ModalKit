@@ -20,6 +20,8 @@ final class NavigationViewController: UINavigationController, MKPresentable {
         return [.large]
     }
 
+    override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+
     // MARK: Lifecycle
 
     init() {

@@ -79,7 +79,6 @@ final class TableViewController: UIViewController, UITableViewDataSource, UITabl
         tableView.delegate = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cellIdentifier")
         tableView.alwaysBounceVertical = false
-        tableView.reloadData()
     }
 
     // MARK: - UITableViewDataSource

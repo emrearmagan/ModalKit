@@ -18,6 +18,8 @@ final class SettingsRootViewController: UIViewController, MKPresentable {
         return [.contentHeight(contentStackView.frame.height + navigationBarHeight)]
     }
 
+    override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+
     private let contentStackView = UIStackView()
 
     /// An enumeration representing the available settings options.
@@ -114,6 +116,13 @@ final class SettingsRootViewController: UIViewController, MKPresentable {
         let height = CGFloat.random(in: 100...UIScreen.main.bounds.height)
         let vc = EmptyViewController(presentationSize: [.contentHeight(height)], backgroundColor: .modalKitBackground)
         vc.title = setting.description
+        vc.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            image: UIImage(systemName: "xmark.circle.fill"),
+            style: .plain,
+            target: self,
+            action: #selector(dismissVC)
+        )
+        vc.navigationItem.rightBarButtonItem?.tintColor = .label
 
         // it is also used in the `NavigationViewController`-Example
         if let navigationController {

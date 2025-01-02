@@ -38,13 +38,13 @@ final class TabBarViewController: UITabBarController, MKPresentable {
 
     /// Sets up the view controllers for the tab bar.
     private func setupViewControllers() {
-        let homeVC = EmptyViewController(presentationSize: [.contentHeight(150)], backgroundColor: .systemBlue)
+        let homeVC = EmptyViewController(presentationSize: [.additionalHeight(.small, 100)], backgroundColor: .systemBlue)
         homeVC.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 0)
 
-        let settingsVC = EmptyViewController(presentationSize: [.contentHeight(300)], backgroundColor: .systemGreen)
+        let settingsVC = EmptyViewController(presentationSize: [.medium], backgroundColor: .systemGreen)
         settingsVC.tabBarItem = UITabBarItem(title: "Settings", image: UIImage(systemName: "gear"), tag: 1)
 
-        let profileVC = EmptyViewController(presentationSize: [.contentHeight(450)], backgroundColor: .systemOrange)
+        let profileVC = EmptyViewController(presentationSize: [.additionalHeight(.large, -100)], backgroundColor: .systemOrange)
         profileVC.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person.circle"), tag: 2)
 
         viewControllers = [homeVC, settingsVC, profileVC]

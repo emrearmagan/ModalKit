@@ -60,7 +60,7 @@ final class TextFieldViewController: UIViewController, MKPresentable {
             contentStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
             contentStackView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             contentStackView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            contentStackView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor),
+            contentStackView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -12),
 
             footerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             footerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
