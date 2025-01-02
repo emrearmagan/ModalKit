@@ -171,7 +171,7 @@ To integrate `ModalKit` into your project using Swift Package Manager, add the f
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/emrearmagan/ModalKit.git", from: "0.0.1")
+    .package(url: "https://github.com/emrearmagan/ModalKit.git")
 ]
 ```
 

@@ -459,7 +459,6 @@ extension MKPresentationController {
         }
 
         // TODO: Fix behaviour when scrollViews contentOffset is intially not .zero for example due to manually setting the offset
-
         let currentOrigin = presentedViewController.view.frame.origin
 
         // Check whether the we have a scroll or the state isnt ended. When the state is ended, we need to snap back to the origin
@@ -514,18 +513,15 @@ extension MKPresentationController {
                     }
                 }
 
-                // If a scroll view is embedded, we consider `largestOrigin` as the top snap.
-                // Otherwise, use `maxPossibleOrigin`.
-                let snapPointY = hasScrollViewEmbeded ? largestOrigin : maxPossibleOrigin
-
+                let snapPointY = largestOrigin
                 // Allow downward dragging without resistance
-                if dragDirection == .down, config.isDismissable {
-                    newOrigin = max(newOrigin, snapPointY)
+                if dragDirection == .down || currentOrigin > snapPointY, config.isDismissable {
+                    newOrigin = max(newOrigin, maxPossibleOrigin)
                 } else {
                     // Scale translation by resistance
                     let resistanceFactor = min(max(config.dragResistance, 0.0), 1.0)
                     let effectiveTranslation = translation.y * (1.0 - resistanceFactor)
-                    newOrigin = max(snapPointY, origin.y + effectiveTranslation)
+                    newOrigin = max(maxPossibleOrigin, origin.y + effectiveTranslation)
                 }
 
                 presentedViewController.view.frame.origin.y = newOrigin
