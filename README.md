@@ -1,3 +1,5 @@
+<meta name="google-site-verification" content="UQYfsidHikoDRb_9oRhIBiDYdZBzx6DHmru-s_5KXM4" />
+
 # ModalKit
 
 ![Platform](https://img.shields.io/badge/platform-ios-lightgray.svg)
