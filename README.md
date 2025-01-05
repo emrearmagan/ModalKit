@@ -8,6 +8,8 @@
 
 **ModalKit** is a simple and flexible framework for managing modal view presentations in iOS. With support for custom animations, configurable presentation sizes, and interactive gestures. ModalKit simplifies the process of creating dynamic and user-friendly modal interfaces.
 
+[📖 Documentation](https://emrearmagan.github.io/ModalKit/)
+
 <div align="center">
   <img src="./Example/Supporting Files/Preview/TableView.gif" width="24%">
   <img src="./Example/Supporting Files/Preview/Default.gif" width="24%">
