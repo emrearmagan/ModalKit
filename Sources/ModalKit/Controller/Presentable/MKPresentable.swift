@@ -15,7 +15,7 @@ import UIKit
 public protocol MKPresentable: AnyObject {
     /// The preferred height for the content of the presented view controller.
     /// - Default: `.intrinsicHeight`
-    var preferredPresentationSize: [MKPresentationSize] { get }
+    @MainActor var preferredPresentationSize: [MKPresentationSize] { get }
 
     /// A `UIScrollView` instance, if any, contained within the view controller.
     ///
@@ -25,13 +25,13 @@ public protocol MKPresentable: AnyObject {
     /// view's scrolling behavior.
     ///
     /// - Default: `nil`
-    var scrollView: UIScrollView? { get }
+    @MainActor var scrollView: UIScrollView? { get }
 
     /// Handles the event when the dimming view (the background area outside the modal) is tapped.
     ///
     /// The default implementation dismisses the modal, but you can override this method to provide custom behavior,
     /// such as displaying an alert or preventing dismissal.
-    func onDimmingViewTap()
+    @MainActor func onDimmingViewTap()
 
     /// Configures the view controller with the necessary presentation settings.
     ///
@@ -39,7 +39,7 @@ public protocol MKPresentable: AnyObject {
     /// the provided `MKPresentableConfiguration` object. The configuration may include properties such as
     /// whether to show a drag indicator, apply rounded corners, or specify the size and appearance of the
     /// presented view.
-    func configure(_ configuration: inout MKPresentableConfiguration)
+    @MainActor func configure(_ configuration: inout MKPresentableConfiguration)
 
     /// Determines if the view controller should respond to a gesture recognized by the modal gesture recognizer.
     ///
