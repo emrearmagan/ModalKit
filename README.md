@@ -3,6 +3,7 @@
 ![Platform](https://img.shields.io/badge/platform-ios-lightgray.svg)
 ![Swift 5.0](https://img.shields.io/badge/Swift-5.0-orange.svg)
 ![iOS 13.0+](https://img.shields.io/badge/iOS-13.0%2B-blue.svg)
+[![SwiftPM](https://img.shields.io/badge/SPM-supported-DE5C43.svg?style=flat)](https://swift.org/package-manager/)
 ![MIT](https://img.shields.io/github/license/mashape/apistatus.svg)
 
 **ModalKit** is a simple and flexible framework for managing modal view presentations in iOS. With support for custom animations, configurable presentation sizes, and interactive gestures. ModalKit simplifies the process of creating dynamic and user-friendly modal interfaces.
@@ -14,8 +15,11 @@
   <img src="./Example/Supporting Files/Preview/TabBar.gif" width="24%">
 </div>
 
+> **⚠️ Important**  
+> The current version is still in development. There can and will be breaking changes in version updates until version 1.0.
+
 ## Features
-- `Multiple Sticky Points`: Effortlessly transition between predefined modal heights, such as small, medium, and large.
+- `Multiple Sticky Points`: Transition between predefined modal heights, such as small, medium, and large.
 - `Scroll View Integration`: Seamlessly handle scroll views, enabling smooth transitions between scrolling and dragging.
 - `Dynamic Resizing`: Adapt the modal's size programmatically or based on content changes.
 
@@ -47,6 +51,35 @@ To dismiss the modal programmatically:
 ```swift
 self.dismiss(animated: true, completion: nil)
 ```
+
+## Presentation Sizes
+ModalKit supports a variety of presentation sizes, which can be defined using the `MKPresentationSize` enum:
+
+- `.large`: Full-screen presentation.
+- `.medium`: Half-screen presentation.
+- `.small`: Quarter-screen presentation.
+- `.contentHeight(CGFloat)`: Fixed height.
+- `.intrinsicHeight`: Automatically adjusts based on content size.
+- `.additionalHeight(MKPresentationSize, CGFloat)`: Allows specifying an additional offset height relative to another presentation size.
+
+You can provide multiple options in preferredPresentationSize. The modal can snap to whichever is appropriate.
+
+Example:
+```swift
+class MyViewController: MKPresentable {
+    var preferredPresentationSize: [MKPresentationSize] {
+        return [.small, .intrinsicHeight, .large]
+}
+```
+
+<img src="./Example/Supporting Files/Preview/Sizes.gif" width="30%">
+
+#### Transition to a New Presentation Size
+You also can programmatically transition the modal to a different size:
+```swift
+self.transition(to: .medium)
+```
+This method animates the modal to the new size while respecting the constraints defined by `MKPresentationSize`. This is particularly useful for modals that need to adapt dynamically to user interactions or content changes.
 
 ## MKPresentable
 View controllers can conform to the MKPresentable protocol to customize how they are presented. This protocol gives you fine-grained control over:
@@ -110,8 +143,24 @@ extension MyViewController: MKPresentable {
 }
 ```
 
+## Dynamic Layout Updates
+ModalKit provides methods to handle layout changes during runtime, ensuring modals adjust properly when their content or constraints change.
+This is especially useful for dynamic content, such as updated text, added views, or changes in size requirements.
 
-### MKPresentableConfiguration
+### Force Layout Updates
+If the layout of the modal is affected by content changes or external updates, you can manually trigger a recalculation to ensure the modal adjusts to its new size. By calling the `presentationLayoutIfNeeded()` method, the modal updates its layout and animates to the correct position based on the `preferredPresentationSize` or other defined size configurations:
+
+```swift
+self.updateUI()
+self.presentationLayoutIfNeeded()
+```
+<div align="center">
+    <img src="./Example/Supporting Files/Preview/Layout1.gif" width="35%">
+    <img src="./Example/Supporting Files/Preview/Layout2.gif" width="35%">
+</div>
+
+
+## MKPresentableConfiguration
 The MKPresentableConfiguration provides a variety of options:
 
 | Option                   | Description                                                                                              |
@@ -124,41 +173,82 @@ The MKPresentableConfiguration provides a variety of options:
 | `dragResistance`         | Specifies how resistant the modal is to drag gestures, ranging from `0.0` (no resistance) to `1.0` (full resistance). Default: `0`. |
 | `hasRoundedCorners`      | Indicates whether the modal should have rounded corners. Default: `false`.                               |
 
-#### Dynamic Layout Updates
-ModalKit provides methods to dynamically adjust the layout and presentation size of modals during runtime.
+## Scroll View Integration
+ModalKit provides built-in support for `UIScrollView` and its subclasses, such as `UITableView` and `UICollectionView`, allowing seamless interaction between scrolling and modal gestures. `ModalKit` ensures smooth transitions when scrolling content overlaps with dragging gestures to resize or dismiss the modal.
 
-##### Force Layout Updates
-When changes occur that affect the layout of the modal, such as content size updates, you can force the layout to recalculate and animate to the correct position:
+### Example
+To enable scroll view integration, implement the `MKPresentable` protocol and return your scroll view in the `scrollView` property:
 ```swift
-self.presentationLayoutIfNeeded()
+class MyViewController: MKPresentable {
+    var scrollView: UIScrollView? {
+        return myTableView
+    }
+}
 ```
-This ensures that the sheet is correctly laid out according to the `preferredPresentationSize`.
+<img src="./Example/Supporting Files/Preview/ScrollViewExample.gif" width="30%">
 
-##### Transition to a New Presentation Size
-You can programmatically transition the modal to a different size:
+Handoff Between Scroll and Drag: When the scroll view is at the top or bottom of its content, dragging gestures transition seamlessly to resizing or dismissing the modal.
+ModalKit observes the scroll view's content offset to determine when to allow dragging or maintain scrolling behavior.
+
+If you need to customize the interaction between the scroll view and the modal, you can override the shouldContinue(with:) method in the MKPresentable protocol:
 ```swift
-self.transition(to: .medium)
-```
-This method animates the modal to the new size while respecting the constraints defined by `MKPresentationSize`. This is particularly useful for modals that need to adapt dynamically to user interactions or content changes.
+class MyViewController: MKPresentable {
+    var scrollView: UIScrollView? {
+        return myTableView
+    }
 
-
-#### Presentation Sizes
-ModalKit supports a variety of presentation sizes, which can be defined using the `MKPresentationSize` enum:
-- `.large`: Full-screen presentation.
-- `.medium`: Half-screen presentation.
-- `.small`: Quarter-screen presentation.
-- `.contentHeight(CGFloat)`: Fixed height.
-- `.intrinsicHeight`: Automatically adjusts based on content size.
-- ``.additionalHeight(MKPresentationSize, CGFloat): Allows specifying an additional offset height relative to another presentation size.
-
-You can provide multiple options in preferredPresentationSize. The modal can snap to whichever is appropriate.
-
-Example:
-```swift
-preferredPresentationSize: [.small, .medium, .large]
+    func shouldContinue(with gestureRecognizer: UIPanGestureRecognizer) -> Bool {
+        // Custom logic to determine if dragging should continue
+        return true
+    }
+}
 ```
 
-### Examples
+## TabBar Integration
+`ModalKit works also great with `UITabBarController`, ensuring that modals are presented above the tab bar without interfering with its functionality. `ModalKit` automatically handles the safe area insets and adjusts the modal's layout to avoid overlapping with the tab bar.
+
+### Example
+```swift
+class MyTabBarViewController: UITabBarController, MKPresentable {
+    /// The preferred presentation size for the currently selected view controller.
+    var preferredPresentationSize: [MKPresentationSize] {
+        if let vc = selectedViewController as? MKPresentable {
+            return vc.preferredPresentationSize
+        }
+        return [.large]
+    }
+}
+```
+<img src="./Example/Supporting Files/Preview/TabBarExample.gif" width="30%">
+
+## Navigation Controller Integration
+`ModalKit` is fully compatible with UINavigationController, allowing modals to be presented within navigation stacks. It also supports smooth transitions between pushed view controllers and modally presented views.
+
+### Example
+
+```swift
+class MyNavigationViewController: UINavigationController, UINavigationControllerDelegate, MKPresentable {
+    /// Returns the preferred presentation size of the top view controller if it conforms to `MKPresentable`,
+    /// otherwise defaults to `.large`.
+    var preferredPresentationSize: [MKPresentationSize] {
+        if let vc = topViewController as? MKPresentable {
+            return vc.preferredPresentationSize
+        }
+        return [.large]
+    }
+
+    override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+
+    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+        guard !navigationController.isBeingPresented else { return }
+        /// Ensures the presentation layout is updated when transitioning between view controllers.
+        presentationLayoutIfNeeded()
+    }
+}
+```
+<img src="./Example/Supporting Files/Preview/NavigationExample.gif" width="30%">
+
+## Examples
 The `ModalKitExample` project provides a variety of usage examples. These examples showcase how to implement and customize ModalKit for different use cases. Explore the `ModalKitExample` project for more details.
 
 ## Requirements
