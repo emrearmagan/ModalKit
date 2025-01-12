@@ -7,30 +7,79 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D0ADBB792D33DF5B0009C3CD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0ADBB682D33DF5B0009C3CD /* AppDelegate.swift */; };
+		D0ADBB7A2D33DF5B0009C3CD /* ExampleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0ADBB692D33DF5B0009C3CD /* ExampleViewController.swift */; };
+		D0ADBB7B2D33DF5B0009C3CD /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0ADBB6B2D33DF5B0009C3CD /* SceneDelegate.swift */; };
+		D0ADBB892D33DF5B0009C3CD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0ADBB6A2D33DF5B0009C3CD /* Main.storyboard */; };
 		D0CB43EC2D1C70C600D5486D /* ModalKit in Frameworks */ = {isa = PBXBuildFile; productRef = D0CB43EB2D1C70C600D5486D /* ModalKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D0ADBB682D33DF5B0009C3CD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D0ADBB692D33DF5B0009C3CD /* ExampleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleViewController.swift; sourceTree = "<group>"; };
+		D0ADBB6B2D33DF5B0009C3CD /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		D0ADBB6C2D33DF5B0009C3CD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D0CB43B22D1C705900D5486D /* ModalKitExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModalKitExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		D0CB43C42D1C705A00D5486D /* Exceptions for "Example" folder in "ModalKitExample" target */ = {
+		D0ADBBC92D33DF640009C3CD /* Exceptions for "Supporting Files" folder in "ModalKitExample" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Supporting Files/Info.plist",
+				"/Localized: LaunchScreen.storyboard",
+				Preview/Default.gif,
+				Preview/Layout1.gif,
+				Preview/Layout2.gif,
+				Preview/NavigationExample.gif,
+				Preview/ScrollViewExample.gif,
+				Preview/Sizes.gif,
+				Preview/TabBar.gif,
+				Preview/TabBarExample.gif,
+				Preview/TableView.gif,
+				Preview/Textfield.gif,
+			);
+			target = D0CB43B12D1C705900D5486D /* ModalKitExample */;
+		};
+		D0ADBBCA2D33DF640009C3CD /* Exceptions for "ViewController" folder in "ModalKitExample" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Default/DefaultViewController.swift,
+				EmptyViewController.swift,
+				Navigation/NavigationViewController.swift,
+				ScrollView/Comment.swift,
+				ScrollView/ScrollViewController.swift,
+				ScrollView/Views/CommentCell.swift,
+				ScrollView/Views/CommentTextFieldView.swift,
+				Stacked/SettingsRootViewController.swift,
+				Static/StaticViewController.swift,
+				TabBar/TabBarViewController.swift,
+				TableView/TableViewController.swift,
+				TextField/TextFieldViewController.swift,
 			);
 			target = D0CB43B12D1C705900D5486D /* ModalKitExample */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		D0CB43B42D1C705900D5486D /* Example */ = {
+		D0ADBB8B2D33DF630009C3CD /* Resources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		D0ADBB9A2D33DF640009C3CD /* Supporting Files */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				D0CB43C42D1C705A00D5486D /* Exceptions for "Example" folder in "ModalKitExample" target */,
+				D0ADBBC92D33DF640009C3CD /* Exceptions for "Supporting Files" folder in "ModalKitExample" target */,
 			);
-			path = Example;
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D0ADBBB02D33DF640009C3CD /* ViewController */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D0ADBBCA2D33DF640009C3CD /* Exceptions for "ViewController" folder in "ModalKitExample" target */,
+			);
+			path = ViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -50,7 +99,13 @@
 		D0CB43A92D1C705900D5486D = {
 			isa = PBXGroup;
 			children = (
-				D0CB43B42D1C705900D5486D /* Example */,
+				D0ADBB682D33DF5B0009C3CD /* AppDelegate.swift */,
+				D0ADBB6B2D33DF5B0009C3CD /* SceneDelegate.swift */,
+				D0ADBB8B2D33DF630009C3CD /* Resources */,
+				D0ADBB9A2D33DF640009C3CD /* Supporting Files */,
+				D0ADBBB02D33DF640009C3CD /* ViewController */,
+				D0ADBB692D33DF5B0009C3CD /* ExampleViewController.swift */,
+				D0ADBB6A2D33DF5B0009C3CD /* Main.storyboard */,
 				D0CB43B32D1C705900D5486D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -79,7 +134,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				D0CB43B42D1C705900D5486D /* Example */,
+				D0ADBB8B2D33DF630009C3CD /* Resources */,
 			);
 			name = ModalKitExample;
 			packageProductDependencies = (
@@ -114,7 +169,7 @@
 			mainGroup = D0CB43A92D1C705900D5486D;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				D0CB43EA2D1C70C600D5486D /* XCLocalSwiftPackageReference "../ModalKit" */,
+				D0CB43EA2D1C70C600D5486D /* XCLocalSwiftPackageReference "../" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D0CB43B32D1C705900D5486D /* Products */;
@@ -131,6 +186,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0ADBB892D33DF5B0009C3CD /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,10 +197,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0ADBB792D33DF5B0009C3CD /* AppDelegate.swift in Sources */,
+				D0ADBB7A2D33DF5B0009C3CD /* ExampleViewController.swift in Sources */,
+				D0ADBB7B2D33DF5B0009C3CD /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		D0ADBB6A2D33DF5B0009C3CD /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D0ADBB6C2D33DF5B0009C3CD /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		D0CB43C62D1C705A00D5486D /* Debug */ = {
@@ -156,7 +226,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = L7BXVNN29K;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Example/Supporting Files/Info.plist";
+				INFOPLIST_FILE = "Supporting Files/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -184,7 +254,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = L7BXVNN29K;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Example/Supporting Files/Info.plist";
+				INFOPLIST_FILE = "Supporting Files/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -346,9 +416,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		D0CB43EA2D1C70C600D5486D /* XCLocalSwiftPackageReference "../ModalKit" */ = {
+		D0CB43EA2D1C70C600D5486D /* XCLocalSwiftPackageReference "../" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../ModalKit;
+			relativePath = ../;
 		};
 /* End XCLocalSwiftPackageReference section */
 
